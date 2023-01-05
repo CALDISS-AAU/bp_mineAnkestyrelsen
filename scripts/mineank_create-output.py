@@ -12,10 +12,12 @@ import pandas as pd
 # Paths
 project_p = join('/work', '214477', 'bp_mineAnkest')
 data_dir = join(project_p, 'data')
+output_dir = join(project_p, 'output')
+
+## Filenames
 data_p = join(data_dir, 'afgørelser_split-parsed.json')
-output_p = join(project_p, 'output')
-info_out = join(output_p, 'afgørelser_oversigt.xlsx')
-grounds_out = join(output_p, 'agørelser_begrundelser.xlsx')
+info_out = join(output_dir, 'afgørelser_oversigt.xlsx')
+grounds_out = join(output_dir, 'agørelser_begrundelser.xlsx')
 
 # Read cases data
 with open(data_p, 'r') as f:
