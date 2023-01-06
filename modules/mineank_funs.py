@@ -21,7 +21,7 @@ def text_splitter(file):
 
     #pattern = re.compile(r'\s{0,5}\n(?=\s{0,4}Ankestyrelsen\s{0,4}\n)', re.DOTALL)
     #pattern = re.compile(r'\s{0,5}\n\s{0,5}A ?n ?k ?e ?s ?t ?y ?r ?e ?l ?s ?e ?n ?\s{0,5}\n\s{0,5}(?!.{0,2}7998)', re.DOTALL)
-    pattern = re.compile(r'{PB}(?=.{0,500}A\s?f\s?g\s?ø\s?r\s?e\s?l\s?s\s?e\s?r?\s{0,5}\n\s{0,5}D\s?u\s? \s?h\s?a\s?r\s? \s?k\s?l\s?a\s?g\s?e\s?t\s? \s?o\s?v\s?e\s?r\s?)', re.DOTALL)
+    pattern = re.compile(r'{PB}(?=.{0,1000}A\s?f\s?g\s?ø\s?r\s?e\s?l\s?s\s?e\s?r?\s{0,5}\n\s{0,5}D\s?u\s? \s?h\s?a\s?r\s? \s?k\s?l\s?a\s?g\s?e\s?t\s? \s?o\s?v\s?e\s?r\s?)', re.DOTALL)
     pattern_replace = re.compile(r'(?<=\n)G\'(?=\s)')
     num_sq_replace = re.compile(r'\[\s?\d\s?\]')
     
@@ -29,6 +29,7 @@ def text_splitter(file):
     text_strip = doc_text.replace('\n', '{LINJESKIFT}')
     text_strip = ''.join(c for c in text_strip if not is_pua(c))
     text_strip = text_strip.replace('{LINJESKIFT}', '\n')
+    text_strip = text_strip.replace('{PB}', '\n')
     text_strip = re.sub(pattern_replace, '', text_strip)
     text_strip = re.sub(num_sq_replace, ' ', text_strip)
     text_strip = text_strip.replace('  ', ' ')
@@ -125,7 +126,7 @@ def get_grounds(text):
     ### - Vi lægger også vægt på … 
     ### - Vi lægger desuden vægt på …
 
-    important_regex = re.compile(r'(?<=\n)(vi lægger (?:\w{3,10})? ?vægt på.*?)(?=\s{1,3}\n\s{1,3}\n)', re.IGNORECASE|re.DOTALL) 
+    important_regex = re.compile(r'(?<=\n)((?:[\w\s]{0,25})?(?:vi )?lægger (?:vi )?(?:[\w\s]{3,30})? ?vægt på.*?)(?=\s{1,3}\n\s{1,3}\n)', re.IGNORECASE|re.DOTALL) 
 
     grounds = important_regex.findall(text)
         
