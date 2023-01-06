@@ -4,6 +4,12 @@ PyPDF2==3.0.1
 scikit-learn==1.2.0
 spacy==3.4.4
 seaborn==0.12.2
+pyLDAvis==3.3.1
 spacy>=3.0.0,<4.0.0
 da_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/da_core_news_sm-3.4.0/da_core_news_sm-3.4.0-py3-none-any.whl
-da_core_news_trf @ https://github.com/explosion/spacy-models/releases/download/da_core_news_trf-3.4.0/da_core_news_trf-3.4.0-py3-none-any.whl
+#da_core_news_trf @ https://github.com/explosion/spacy-models/releases/download/da_core_news_trf-3.4.0/da_core_news_trf-3.4.0-py3-none-any.whl
+#tweetopic
+#Pillow
+#opencv-python
+#pytesseract
+#pdf2image
