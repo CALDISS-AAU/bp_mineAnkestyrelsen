@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-pip install pdfminer-six
-pip install pandas
-pip install nltk
-pip install spacy
-pip install PyPDF2
-pip install openpyxl
+sudo apt-get update
+sudo apt-get install poppler-utils
+sudo apt-get install tesseract-ocr
 
-python -m spacy download da_core_news_lg
+sudo wget https://github.com/tesseract-ocr/tessdata/raw/4.00/dan.traineddata -P /usr/share/tesseract-ocr/4.00/tessdata
+
+pip install --upgrade pip
+pip install -r requirements.txt
