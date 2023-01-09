@@ -41,7 +41,7 @@ for pdf_file in pdf_files:
     pdf_processed = process_pdf(pdf_path)
 
     with open(out_p, 'w') as f:
-        json.dump(pdf_processed)
+        json.dump(pdf_processed, f)
 
 # Split into individual case texts
 #n_total = 227 # der bør være 227 afgørelser i alt
