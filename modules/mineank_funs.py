@@ -152,7 +152,6 @@ def get_info_main(text):
     # regexes
     kommune_re = re.compile(r'Du har klaget over ([a-zæøå]+(?:\-[a-zæøå]+)?)\s\s?[K]\w+', re.IGNORECASE)
     caseworker_re = re.compile(r'venlig hilsen\s{1,5}([a-zæøå]+\s[a-zæøå]+(\s[a-zæøå]+)?)', re.IGNORECASE)
-    stadf_re = re.compile(r'vi\s{1,2}stadfæster', re.IGNORECASE)
     crit_re = re.compile(r'(?<=\n)vi kritiserer', re.IGNORECASE)
 
     text = clean_text(text)
@@ -173,7 +172,6 @@ def get_info_main(text):
     
     info_dict['kommune'] = kommune
     info_dict['caseworker'] = caseworker
-    info_dict['stadfæster'] = bool(stadf_re.search(text))
     info_dict['kritik_kommune'] = bool(crit_re.search(text))
     
     
