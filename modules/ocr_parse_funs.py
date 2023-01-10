@@ -144,7 +144,12 @@ def process_pdf(filepath):
         
         # Check whether page is irrelevant - A new case will start with a page with no pagenumber with the next page having a pagenumber. Other pages with no pagenumbers are appendices
         if current_page_no == 0 and prev_page_no == 0:
-            case_pages[-1] = current_page 
+            # Replace last entry if case_pages is not empty
+            if len(case_pages) > 0:
+                case_pages[-1] = current_page
+            # Add as first entry of case_pages if empty
+            else:
+                case_pages.append(current_page)
 
         # Check for new case - repeated "blank" pagenumbers handled by if-statement above    
         elif current_page_no == 0 and prev_page_no > 0:
