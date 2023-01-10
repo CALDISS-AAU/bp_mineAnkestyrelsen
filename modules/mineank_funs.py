@@ -57,26 +57,67 @@ def text_splitter(file):
     
     return(texts_return)
 
+def clean_text(text):
 
-def get_info(text):
-    """
-    Extract info from case document.
-    """
-    
     # regexes
-    cpr_re = re.compile(r'\nCpr\.\s?nr\.\s+(\d+)\s+(\d+)', re.IGNORECASE)
-    kommune_re = re.compile(r'Du har klaget over ([a-zæøå]+(?:\-[a-zæøå]+)?)\s\s?[K]\w+', re.IGNORECASE)
-    jnr_re = re.compile(r'j\.nr\.?\s+([0-9]+\-[0-9]+)', re.IGNORECASE)
-    caseworker_re = re.compile(r'venlig hilsen\s{1,5}([a-zæøå]+\s[a-zæøå]+(\s[a-zæøå]+)?)', re.IGNORECASE)
+    pattern_replace = re.compile(r'(?<=\n)G\'(?=\s)')
+    num_sq_replace = re.compile(r'\[\s?\d\s?\]')
 
+    text_strip = text.replace('\n', '{LINJESKIFT}')
+    text_strip = ''.join(c for c in text_strip if not is_pua(c))
+    text_strip = text_strip.replace('{LINJESKIFT}', '\n')
+    text_strip = re.sub(pattern_replace, '', text_strip)
+    text_strip = re.sub(num_sq_replace, ' ', text_strip)
+    text_strip = text_strip.replace('  ', ' ')
+    text_strip = text_strip.replace('—', '-')
+    text_strip = text_strip.replace(' -', '-')
+    text_strip = text_strip.replace('- ', '-')
+    text_strip = text_strip.replace('-\n', '')
+    
+    return(text)
+
+
+def get_info_meta(text):
+    """
+    Extract info from meta information in case document (right margin on first page)
+    """
+
+    # regexes
+    jnr_re = re.compile(r'j\.nr\.?\s+([0-9]+\s?[-—]\s?[0-9]+)', re.IGNORECASE)
+    date_re = re.compile(r'(?<=\n)\d{1,2}\.\s?\w{4,10}\s?\d{4}')
+
+    text = clean_text(text)
 
     info_dict = {}
-    
+
     try:
         jnr = jnr_re.search(text).group(1)
     except:
         jnr = 'not found'
-        
+
+    try:
+        date = date_re.search(text).group(0)
+    except:
+        date = 'not found'
+
+    info_dict['jnr'] = jnr
+    info_dict['date'] = date
+    
+    return(info_dict)
+
+
+def get_info_cpr(text):
+    """
+    Extract CPR info from case document.
+    """
+
+    # regexes
+    cpr_re = re.compile(r'\nCpr\.\s?nr\.\s+(\d+)\s+(\d+)', re.IGNORECASE)
+
+    text = clean_text(text)
+
+    info_dict = {}
+
     try:
         birthyear = cpr_re.search(text).group(1)
         if int(birthyear) > 21:
@@ -93,11 +134,32 @@ def get_info(text):
         if int(gender) % 2 == 0:
             gender = 'female'
         else:
-            gender = 'male'
-            
+            gender = 'male' 
     except:
         gender = 'not found'
+
+    info_dict['birthyear'] = birthyear
+    info_dict['gender'] = gender
+
+    return(info_dict)
+
+
+def get_info_main(text):
+    """
+    Extract info from main text in case document.
+    """
     
+    # regexes
+    kommune_re = re.compile(r'Du har klaget over ([a-zæøå]+(?:\-[a-zæøå]+)?)\s\s?[K]\w+', re.IGNORECASE)
+    caseworker_re = re.compile(r'venlig hilsen\s{1,5}([a-zæøå]+\s[a-zæøå]+(\s[a-zæøå]+)?)', re.IGNORECASE)
+    stadf_re = re.compile(r'vi\s{1,2}stadfæster', re.IGNORECASE)
+    crit_re = re.compile(r'(?<=\n)vi kritiserer', re.IGNORECASE)
+
+    text = clean_text(text)
+
+    info_dict = {}
+
+
     try:
         kommune = kommune_re.search(text).group(1)
     except:
@@ -108,11 +170,12 @@ def get_info(text):
     except:
         caseworker = 'not found'
     
-    info_dict['jnr'] = jnr
-    info_dict['birthyear'] = birthyear
-    info_dict['gender'] = gender
+    
     info_dict['kommune'] = kommune
     info_dict['caseworker'] = caseworker
+    info_dict['stadfæster'] = bool(stadf_re.search(text))
+    info_dict['kritik_kommune'] = bool(crit_re.search(text))
+    
     
     return(info_dict)
 
@@ -121,13 +184,17 @@ def get_grounds(text):
     """
     Extract grounds from case document.
     """
+
+    text = clean_text(text)
+    
     ## begrundelser
     ### - Vi lægger vægt …
     ### - Vi lægger også vægt på … 
     ### - Vi lægger desuden vægt på …
 
-    important_regex = re.compile(r'(?<=\n)((?:[\w\s]{0,25})?(?:vi )?lægger (?:vi )?(?:[\w\s]{3,30})? ?vægt på.*?)(?=\s{1,3}\n\s{1,3}\n)', re.IGNORECASE|re.DOTALL) 
-
+    #important_regex = re.compile(r'(?<=\n)((?:[\w\s]{0,25})?(?:vi )?lægger (?:vi )?(?:[\w\s]{3,30})? ?vægt på.*?)(?=\s{1,3}\n\s{1,3}\n)', re.IGNORECASE|re.DOTALL) 
+    important_regex = re.compile(r'(?<=\n)((?:[\w\s]{0,25})?(?:vi )?lægger (?:vi )?(?:[\w\s]{3,30})? ?vægt på.*?)(?=\n\n)', re.IGNORECASE|re.DOTALL) 
+    
     grounds = important_regex.findall(text)
         
     return(grounds)
