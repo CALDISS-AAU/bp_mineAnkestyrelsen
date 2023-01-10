@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
 import re
@@ -11,6 +11,7 @@ import cv2
 from PIL import Image
 import pytesseract
 import sys
+from PyPDF2 import PdfReader
 
 project_p = join('/work', '214477', 'bp_mineAnkest')
 modules_p = join(project_p, 'modules')
@@ -36,14 +37,22 @@ for pdf_file in pdf_files:
     outfile = f'{pdf_file.split(" ")[0]}_split-ocr.json'
     out_p = join(ocr_dir, outfile)
     
-    pdf_path = join(data_dir, pdf_file)
+    if os.path.isfile(out_p):
+        continue
+    else:    
+        pdf_path = join(data_dir, pdf_file)
 
-    pdf_processed = process_pdf(pdf_path)
+        pdf_processed = process_pdf(pdf_path)
 
-    with open(out_p, 'w') as f:
-        json.dump(pdf_processed, f)
+        reader = PdfReader(pdf_path)
 
-# Split into individual case texts
-#n_total = 227 # der bør være 227 afgørelser i alt
+        for entry in pdf_processed:
+            metapageno = entry.get('metadocpageno') - 1
 
-#all_cases = []
+            metapage_text = reader.pages[metapageno].extract_text()
+
+            entry['metapage_text'] = metapage_text
+            entry['filename'] = filename
+
+        with open(out_p, 'w') as f:
+            json.dump(pdf_processed, f)
