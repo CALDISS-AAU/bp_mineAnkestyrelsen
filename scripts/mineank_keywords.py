@@ -8,8 +8,6 @@ import json
 import sys
 from pprint import pprint 
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import spacy 
 
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -21,7 +19,7 @@ data_dir = join(project_p, 'data')
 output_dir = join(project_p, 'output')
 
 ## Filenames
-data_p = join(data_dir, 'afgørelser_split-parsed.json')
+data_p = join(data_dir, 'afgørelser_split-extracted.json')
 
 
 # Read cases data
@@ -66,8 +64,8 @@ for entry in data:
     entry['grounds_tokens'] = tokenizer(entry.get('grounds'))
 
 
-# Selektér kun dokumenter med fundne begrundelser
-data_select = [entry.copy() for entry in data if entry.get('grounds') != '']
+# Selektér kun dokumenter med begrundelser med mere end 10 tokens (korte begrundelser betyder, at de blot refererer til kommunens begrundelse)
+data_select = [entry.copy() for entry in data if len(entry.get('grounds_tokens')) >  10]
 
 
 # Konvertér til data frame
