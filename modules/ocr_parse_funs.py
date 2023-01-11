@@ -90,7 +90,9 @@ def comb_case_pages(case_pages):
                  'metadocpageno': metadocpageno,
                  'filename': filename,
                  'docpageno_range': {'start': start_docpage,
-                                     'end': end_docpage}}
+                                     'end': end_docpage},
+                 'text_pages': dict(zip([page.get('pageno') for page in case_pages], [page.get('main') for page in pages]))
+    }
 
     return(case_conv)
 
