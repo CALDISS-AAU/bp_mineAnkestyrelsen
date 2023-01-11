@@ -77,11 +77,20 @@ def comb_case_pages(case_pages):
     meta = ''.join([page.get('meta') for page in case_pages]) # Meta as one string
     text = '\n'.join([page.get('main') for page in case_pages]) # Text as one large string (no use for keeping it on separate pages)
     metadocpageno = case_pages[0].get('docpageno') # Pagenumber for where metadata is in original document
+    filename = case_pages[0].get('filename') # Filename
+
+    # Doc pagenumber range
+    docpagenos = [page.get('docpageno') for page in case_pages]
+    start_docpage = min(docpagenos)
+    end_docpage = max(docpagenos)
 
     # Convert to dictionary
     case_conv = {'meta': meta,
                  'text': text,
-                 'metadocpageno': metadocpageno}
+                 'metadocpageno': metadocpageno,
+                 'filename': filename,
+                 'docpageno_range': {'start': start_docpage,
+                                     'end': end_docpage}}
 
     return(case_conv)
 
@@ -109,6 +118,16 @@ def process_pdf(filepath):
         # Append to list
         pages_conv.append(page_conv)
     
+    # Return processed pages
+    return(pages_conv)
+
+
+def cases_split(pages):
+    """Split document into individual cases from OCR-scanned pages.
+
+    Args:
+        pages: JSON records for OCR-scanned PDF pages.
+    """
 
     # Combine processed pages to cases 
     ## List for cases
@@ -119,10 +138,10 @@ def process_pdf(filepath):
     prev_page_no = 0 # Starting point for previous page no
 
     ## Iterate over processed pages
-    for i in range(len(pages_conv)):
+    for i in range(len(pages)):
         
         # Extract current processed page
-        current_page = pages_conv[i]
+        current_page = pages[i]
         # Extract pagenumber - used to identify when new case starts
         current_page_no = int(current_page.get('pageno'))
         
@@ -132,7 +151,7 @@ def process_pdf(filepath):
             continue
         
         # Check whether it is the last page and that page is relevant (relevant pages have a page number, except first page in a case. A case is never just one page.)
-        if i == max(range(len(pages_conv))) and current_page_no > 0:
+        if i == max(range(len(pages))) and current_page_no > 0:
             # A case is never just one page
             if len(case_pages) > 1:
                 # Append last page to case
