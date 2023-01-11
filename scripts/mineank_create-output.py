@@ -26,7 +26,7 @@ with open(data_p, 'r') as f:
 
 # Create output tables
 cases_df = pd.DataFrame.from_records(data)
-info_df = cases_df[['filename', 'n', 'jnr', 'birthyear', 'gender', 'kommune', 'caseworker']]
+info_df = cases_df[['filename', 'n', 'jnr', 'date', 'caseworker', 'kommune', 'birthyear', 'gender', 'kritik_kommune', 'grounds_nchar']]
 
 grounds_df = cases_df[['jnr', 'grounds']]
 grounds_df = grounds_df.loc[~grounds_df['grounds'].isna(),:]
