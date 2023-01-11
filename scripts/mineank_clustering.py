@@ -190,7 +190,7 @@ plot_top_words(lda, tf_feature_names, 15, "Topics in LDA model")
 # LDA
 ## Corpus objects
 id2token = corpora.Dictionary([entry.get('grounds_tokens') for entry in data_select])
-gensim.matutils.Sparse2Corpus(sparse, documents_columns=True)
+#gensim.matutils.Sparse2Corpus(sparse, documents_columns=True)
 
 ### Gensim doc2bow corpus
 for entry in data_select:
@@ -204,7 +204,6 @@ tfidf = gensim.models.TfidfModel(tokens_bow)
 for entry in data_select:
     entry['tfidfbow'] = tfidf[entry.get('doc2bow')]
 
-tokens_bow = [entry.get('doc2bow') for entry in data_select]
 tokens_tfidf = [entry.get('tfidfbow') for entry in data_select]
 
 ## Setup model

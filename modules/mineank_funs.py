@@ -146,16 +146,32 @@ def get_info_cpr(text):
 
 def get_info_main(text):
     """
-    Extract info from main text in case document.
+    Extract info from main text in case document, including grounds.
     """
     
     # regexes
     kommune_re = re.compile(r'Du har klaget over ([a-zæøå]+(?:\-[a-zæøå]+)?)\s\s?[K]\w+', re.IGNORECASE)
     caseworker_re = re.compile(r'venlig hilsen\s{1,5}([a-zæøå]+\s[a-zæøå]+(\s[a-zæøå]+)?)', re.IGNORECASE)
     crit_re = re.compile(r'(?<=\n)vi kritiserer', re.IGNORECASE)
+    subsid_am_re = re.compile(r'revalidering.{2,25}subsidiær.{5,40}arbejdsmarkedsordninger', re.IGNORECASE | re.DOTALL)
+    subsid_udd_re = re.compile(r'revalidering.{2,25}subsidiær.{5,40}uddannelsesordninger', re.IGNORECASE | re.DOTALL)
 
+    ## begrundelser
+    ### - Vi lægger vægt …
+    ### - Vi lægger også vægt på … 
+    ### - Vi lægger desuden vægt på …
+
+    #important_regex = re.compile(r'(?<=\n)((?:[\w\s]{0,25})?(?:vi )?lægger (?:vi )?(?:[\w\s]{3,30})? ?vægt på.*?)(?=\s{1,3}\n\s{1,3}\n)', re.IGNORECASE|re.DOTALL) 
+    important_regex = re.compile(r'(?<=\n)((?:[\w\s]{0,25})?(?:vi )?lægger (?:vi )?(?:[\w\s]{3,30})? ?vægt på.*?)(?=\n\n)', re.IGNORECASE|re.DOTALL) 
+
+    ## åbenlyst
+    ## - "vurderes åbenlyst, at du ikke opfylder betingelserne"
+    obv_re = re.compile(r'.{50}åbenlys.{150}', re.IGNORECASE | re.DOTALL)
+
+    # Clean text
     text = clean_text(text)
 
+    # Dictionary for info
     info_dict = {}
 
 
@@ -169,30 +185,16 @@ def get_info_main(text):
     except:
         caseworker = 'not found'
     
+    grounds = important_regex.findall(text)
+    grounds_len = len(''.join(grounds))
     
     info_dict['kommune'] = kommune
     info_dict['caseworker'] = caseworker
     info_dict['kritik_kommune'] = bool(crit_re.search(text))
-    
+    info_dict['subsid_am'] = bool(subsid_am_re.search(text))
+    info_dict['subsid_udd'] = bool(subsid_udd_re.search(text))
+    info_dict['grounds'] = grounds
+    info_dict['grounds_nchar'] = grounds_len
+    info_dict['vurdering_åbenlys'] = bool(obv_re.search(text))
     
     return(info_dict)
-
-
-def get_grounds(text):
-    """
-    Extract grounds from case document.
-    """
-
-    text = clean_text(text)
-    
-    ## begrundelser
-    ### - Vi lægger vægt …
-    ### - Vi lægger også vægt på … 
-    ### - Vi lægger desuden vægt på …
-
-    #important_regex = re.compile(r'(?<=\n)((?:[\w\s]{0,25})?(?:vi )?lægger (?:vi )?(?:[\w\s]{3,30})? ?vægt på.*?)(?=\s{1,3}\n\s{1,3}\n)', re.IGNORECASE|re.DOTALL) 
-    important_regex = re.compile(r'(?<=\n)((?:[\w\s]{0,25})?(?:vi )?lægger (?:vi )?(?:[\w\s]{3,30})? ?vægt på.*?)(?=\n\n)', re.IGNORECASE|re.DOTALL) 
-    
-    grounds = important_regex.findall(text)
-        
-    return(grounds)

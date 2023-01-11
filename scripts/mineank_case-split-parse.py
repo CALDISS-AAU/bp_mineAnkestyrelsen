@@ -21,7 +21,7 @@ from ocr_parse_funs import cases_split
 # Paths
 data_dir = join(project_p, 'data')
 ocr_dir = join(data_dir, 'ocr')
-out_p = join(data_dir, 'afgørelser_split-extracted.json')
+out_p = join(data_dir, 'afgørelser_split-parsed.json')
 
 ocr_files = [file for file in os.listdir(ocr_dir) if file.endswith('all-pages.json')]
 
@@ -64,10 +64,6 @@ for entry in all_cases:
     entry.update(get_info_main(entry.get('text')))
     entry.update(get_info_cpr(entry.get('metapage_text')))
     entry.update(get_info_meta(entry.get('meta')))
-
-    case_grounds = get_grounds(entry.get('text'))
-    entry['grounds'] = case_grounds
-
 
 # Save data as JSON
 with open(out_p, 'w') as f:
