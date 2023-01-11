@@ -31,10 +31,9 @@ if not os.path.isdir(ocr_dir):
 pdf_files = [file for file in os.listdir(data_dir) if file.endswith('.pdf')]
 
 # Proces PDF files
-
 for pdf_file in pdf_files:
     
-    outfile = f'{pdf_file.split(" ")[0]}_split-ocr.json'
+    outfile = f'{pdf_file.split(" ")[0]}_split-ocr_all-pages.json'
     out_p = join(ocr_dir, outfile)
     
     if os.path.isfile(out_p):
@@ -44,15 +43,5 @@ for pdf_file in pdf_files:
 
         pdf_processed = process_pdf(pdf_path)
 
-        reader = PdfReader(pdf_path)
-
-        for entry in pdf_processed:
-            metapageno = entry.get('metadocpageno') - 1
-
-            metapage_text = reader.pages[metapageno].extract_text()
-
-            entry['metapage_text'] = metapage_text
-            entry['filename'] = filename
-
         with open(out_p, 'w') as f:
-            json.dump(pdf_processed, f)
+            json.dump(pdf_processed, f)        
