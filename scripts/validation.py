@@ -7,6 +7,7 @@ from os.path import join
 import json
 from PyPDF2 import PdfReader
 import sys
+import pandas as pd
 
 project_p = join('/work', '214477', 'bp_mineAnkest')
 modules_p = join(project_p, 'modules')
@@ -18,28 +19,44 @@ from ocr_parse_funs import cases_split
 # Paths
 data_dir = join(project_p, 'data')
 ocr_dir = join(data_dir, 'ocr')
-out_p = join(data_dir, 'afgørelser_split-parsed.json')
+data_all_p = join(data_dir, 'afgørelser_split-parsed.json')
 
 ocr_files = [file for file in os.listdir(ocr_dir) if file.endswith('all-pages.json')]
 
-all_metas = []
+jnr_re = re.compile(r'j\.nr\.?\s+([0-9]+\s?.{1,3}\s?[0-9]+)', re.IGNORECASE)
+
+all_jnr = []
 
 for file in ocr_files:
     with open(join(ocr_dir, file), 'r') as f:
         pages = json.load(f)
     
+    filename = pages[0].get('filename')
+
     metas = [page.get('meta') for page in pages]
 
-    all_metas = all_metas + metas
+    for meta in metas:
+        txt = clean_text(meta)
+
+        if jnr_re.search(txt):
+
+            info = {'filename': filename,
+                    'jnr': jnr_re.search(txt).group(1)}
+            
+            all_jnr.append(info)
 
 
-all_metas = [clean_text(meta) for meta in all_metas]
+# data frames
+all_jnr_df = pd.DataFrame.from_records(all_jnr)
 
-jnr_re = re.compile(r'j\.nr\.?\s+([0-9]+\s?.{1,3}\s?[0-9]+)', re.IGNORECASE)
+data_df = pd.read_json(data_all_p, orient = 'records')
+data_df = data_df[['filename', 'jnr']]
 
-jnr_re = re.compile(r'j.{1,2}nr{1,2}', re.IGNORECASE)
+# Identify what values are in TableB and not in TableA
+key_diff = set(all_jnr_df.jnr).difference(data_df.jnr)
 
-all_jnr = [jnr_re.search(meta).group(0) for meta in all_metas if bool(jnr_re.search(meta))]
-# 
-
-#metas = [ocr_file.get('meta')]
+missing_jnr = all_jnr_df.loc[all_jnr_df['jnr'].isin(key_diff) & (all_jnr_df['jnr'] != '22-40320'), :] # 22-40320 er sagsnummer for forskerens aktindsigt
+if missing_jnr.shape[0] == 0:
+    print('All J.nr. included')
+else:
+    print(f'{missing_jnr.shape[0]} j.nr missing')

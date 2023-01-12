@@ -15,7 +15,6 @@ sys.path.append(modules_p)
 from mineank_funs import get_info_main
 from mineank_funs import get_info_cpr
 from mineank_funs import get_info_meta
-from mineank_funs import get_grounds
 from ocr_parse_funs import cases_split
 
 # Paths
@@ -55,7 +54,7 @@ for file in ocr_files:
 
 
 # Check how many missing
-n_total = 227 # der bør være 227 afgørelser i alt
+n_total = 183 # der bør være 227 afgørelser i alt
 print(f'Der mangler {n_total-len(all_cases)} afgørelser')
 
 

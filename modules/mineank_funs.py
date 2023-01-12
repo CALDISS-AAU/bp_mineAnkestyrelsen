@@ -74,7 +74,7 @@ def clean_text(text):
     text_strip = text_strip.replace('- ', '-')
     text_strip = text_strip.replace('-\n', '')
     
-    return(text)
+    return(text_strip)
 
 
 def get_info_meta(text):
