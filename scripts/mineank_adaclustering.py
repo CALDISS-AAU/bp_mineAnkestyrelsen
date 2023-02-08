@@ -114,7 +114,7 @@ final_ada_clustering = np.apply_along_axis(lambda x: np.argmax(np.bincount(x)), 
 
 ## Add to data
 text_key = [re.search(r'^\d{1,2}(?= \-)', entry.get('filename')).group(0) + '-' + str(entry.get('no')) for entry in data_select]
-cluster_pred = dict(zip(text_key, final_ada_clustering))
+cluster_pred = dict(zip(text_key, [str(cluster) for cluster in final_ada_clustering]))
 
 ## Save to file
 with open(cluster_out_p, 'w', encoding = 'utf-8') as f:
