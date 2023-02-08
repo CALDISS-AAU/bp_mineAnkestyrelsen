@@ -54,7 +54,7 @@ for file in ocr_files:
 
 
 # Check how many missing
-n_total = 183 # der bør være 227 afgørelser i alt
+n_total = 183 # der bør være 183 afgørelser i alt
 print(f'Der mangler {n_total-len(all_cases)} afgørelser')
 
 
@@ -63,6 +63,21 @@ for entry in all_cases:
     entry.update(get_info_main(entry.get('text')))
     entry.update(get_info_cpr(entry.get('metapage_text')))
     entry.update(get_info_meta(entry.get('meta')))
+
+
+# Add file counter (acts as ID for missing JNR)
+n = 1
+prev_filename = ''
+for entry in all_cases:
+    if entry.get('filename') != prev_filename:
+        n = 1
+    else:
+        n = n + 1
+    
+    entry['no'] = n
+
+    prev_filename = entry.get('filename')
+
 
 # Save data as JSON
 with open(out_p, 'w') as f:
