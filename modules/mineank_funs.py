@@ -84,7 +84,7 @@ def get_info_meta(text):
 
     # regexes
     jnr_re = re.compile(r'j\.nr\.?\s+([0-9]+\s?[-—]\s?[0-9]+)', re.IGNORECASE)
-    date_re = re.compile(r'(?<=\n)\d{1,2}\.\s?\w{4,10}\s?\d{4}')
+    date_re = re.compile(r'(?<=\n)\d{1,2}\..{0,3}\w{3,10}\s?\d{4}')
 
     text = clean_text(text)
 
