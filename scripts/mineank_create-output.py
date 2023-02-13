@@ -44,7 +44,7 @@ cases_df = pd.merge(cases_df, cluster_df, on = 'merge_key', how = 'left')
 
 # Create output table
 info_df = cases_df[['filename', 'no', 'docpageno_range', 'jnr', 'date', 'caseworker', 'kommune', 'birthyear', 
-                    'gender', 'kritik_kommune', 'subsid_am', 'subsid_udd', 'vurdering_åbenlys', 'grounds_nchar', 'cluster']]
+                    'gender', 'kritik_kommune', 'subsid_am', 'subsid_udd', 'vurdering_åbenlys', 'usikkert', 'grounds_nchar', 'cluster']]
 
 
 # Recode clusters
@@ -57,6 +57,11 @@ info_df['cluster'] = info_df['cluster'].replace(cluster_rename)
 gndr_recode = {'male': 'Mand', 'female': 'Kvinde'}
 
 info_df['gender'] = info_df['gender'].replace(gndr_recode)
+
+# Fix caseworker
+niclas_recode = {'Niclas Frils Havy': 'Niclas Friis Hay', 'Niclas Frils Hay': 'Niclas Friis Hay', 'Niclas Friis Havy': 'Niclas Friis Hay'}
+
+info_df['caseworker'] = info_df['caseworker'].replace(niclas_recode)
 
 # Rename columns
 columns_rename = {'filename': 'Filnavn', 
@@ -72,6 +77,7 @@ columns_rename = {'filename': 'Filnavn',
                   'subsid_am': 'Frase: Subsidiær, AM', 
                   'subsid_udd': 'Frase: Subsidiær, udd.', 
                   'vurdering_åbenlys': 'Frase: Vurder åbenlys', 
+                  'usikkert': 'Frase: Usikkert, revalidering',
                   'grounds_nchar': 'Antal tegn, begrundelse', 
                   'cluster': 'Begrundelsesgruppe'}
 

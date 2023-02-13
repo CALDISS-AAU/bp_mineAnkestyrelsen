@@ -150,11 +150,12 @@ def get_info_main(text):
     """
     
     # regexes
-    kommune_re = re.compile(r'Du har klaget over ([a-zæøå]+(?:\-[a-zæøå]+)?)\s\s?[K]\w+', re.IGNORECASE)
-    caseworker_re = re.compile(r'venlig hilsen\s{1,5}([a-zæøå]+\s[a-zæøå]+(\s[a-zæøå]+)?)', re.IGNORECASE)
-    crit_re = re.compile(r'(?<=\n)vi kritiserer', re.IGNORECASE)
-    subsid_am_re = re.compile(r'revalidering.{2,25}subsidiær.{5,40}arbejdsmarkedsordninger', re.IGNORECASE | re.DOTALL)
-    subsid_udd_re = re.compile(r'revalidering.{2,25}subsidiær.{5,40}uddannelsesordninger', re.IGNORECASE | re.DOTALL)
+    kommune_re = re.compile(r'Du har klaget over ([a-zæøå]+(?:\-[a-zæøå]+)?)\s\s?[K]\w+', re.IGNORECASE) # kommunenavn
+    caseworker_re = re.compile(r'venlig hilsen\s{1,5}([a-zæøå]+\s[a-zæøå]+(\s[a-zæøå]+)?)', re.IGNORECASE) # sagsbehandler
+    crit_re = re.compile(r'(?<=\n)vi kritiserer', re.IGNORECASE) # kritiserer kommunen
+    subsid_am_re = re.compile(r'revalidering.{2,25}subsidiær.{5,40}arbejdsmarkedsordninger', re.IGNORECASE | re.DOTALL) # subsidiær ift. arbejdsmarked
+    subsid_udd_re = re.compile(r'revalidering.{2,25}subsidiær.{5,40}uddannelsesordninger', re.IGNORECASE | re.DOTALL) # subsidiær ift. uddannelse
+    usikkert_re = re.compile(r'usikkert.{4,8}revalidering.{4,8}nødvendigt', re.IGNORECASE | re.DOTALL) # usikkert om revalidering er nødvendigt - "usikkert" bruges ikke i andre sammenhæng
 
     ## begrundelser
     ### - Vi lægger vægt …
@@ -193,6 +194,7 @@ def get_info_main(text):
     info_dict['kritik_kommune'] = bool(crit_re.search(text))
     info_dict['subsid_am'] = bool(subsid_am_re.search(text))
     info_dict['subsid_udd'] = bool(subsid_udd_re.search(text))
+    info_dict['usikkert'] = bool(usikkert_re.search(text))
     info_dict['grounds'] = grounds
     info_dict['grounds_nchar'] = grounds_len
     info_dict['vurdering_åbenlys'] = bool(obv_re.search(text))
